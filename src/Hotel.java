@@ -1,7 +1,7 @@
 import java.util.*;
 import java.sql.*;
 public class Hotel {
-    Set<Integer>Avrooms=new HashSet<>();
+    Set<Integer>Avrooms=new LinkedHashSet<>();
     void add(String name,int phno,String email,String rmtyp,String frm,String to,int days,String roomsno,int rooms,int amont ){
         try{
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/rooms","root","1234");
@@ -15,9 +15,7 @@ public class Hotel {
             }
             System.out.println("Customer Added.");
         }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        catch(Exception e){}
     }
     void Remove(String name,String name2){
         try{
@@ -32,7 +30,12 @@ public class Hotel {
                         Avrooms.remove(i);
                     }
                 }int r=st.executeUpdate("delete from customer where name='"+name2+"';");
-            System.err.println("Customer removed");
+                if (r!=0) {
+                    System.err.println("Customer removed");
+                }
+                else{
+                    System.out.println("No Customers found");
+                }
             }   
             if (!name.equals("muf")) { 
                 ResultSet rs2=st.executeQuery("select amount from customer where name='"+name+"';");
@@ -47,11 +50,16 @@ public class Hotel {
                     }
                 }
                 int r2=st.executeUpdate("delete from customer where name='"+name+"';");
-                System.err.println("Customer removed");
+                if (r2!=0) {
+                    System.err.println("Customer removed");
+                }
+                else{
+                    System.out.println("No Customers found");
+                }
             }   
         }
         catch(Exception e){
-            e.printStackTrace();
+            System.out.println("No Customers Found");
         }
     }
     void search(int rno,String name){
@@ -71,21 +79,37 @@ public class Hotel {
             }
         }
         catch(Exception e){
-            e.printStackTrace();
+            System.out.println("No Customers Found");
         }   
     }
     void ViewAllCustomer(){
         try{
+            int i=0;
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/rooms","root","1234");
             Statement st=con.createStatement();
             ResultSet rs=st.executeQuery("select * from customer;");
             while(rs.next()){
                 System.out.println("\nName:"+rs.getString(1)+"\nPh no:"+rs.getInt(2)+"\nE-mail:"+rs.getString(3)+"\nRoom type:"+rs.getString(4)+"\nFrom:"+rs.getString(5)+"\nTo:"+rs.getString(6)+"\nDays:"+rs.getInt(7)+"\nRooms No:"+rs.getString(8)+"\nRooms:"+rs.getInt(9)+"\nAmount:"+rs.getInt(10));
+                i++;
             }
+            System.out.println("Total Customers:"+i);
         }
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+    void Wallet(){
+      try{
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/rooms","root","1234");
+            Statement st=con.createStatement();
+            ResultSet rs=st.executeQuery("select wallet from wallet;");
+            rs.next();
+                System.out.println("Amount:"+rs.getString(1));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
     }
     public static void main(String[] args){
         Hotel ht=new Hotel();
@@ -105,7 +129,7 @@ public class Hotel {
         }
         catch(Exception e){}
         while (true) {
-            System.out.println("\n1.Add Customer\n2.Remove Customer\n3.Search\n4.Occupied Rooms\n5.View All Customer");
+            System.out.println("\n1.Add Customer\n2.Remove Customer\n3.Search\n4.Occupied Rooms\n5.View All Customer\n6.Wallet\n0 for stop");
             int choice=sc.nextInt();
             if(choice==1) {
                 sc.nextLine();
@@ -153,7 +177,7 @@ public class Hotel {
                                         }
                                     }
                                     else{
-                                        System.out.println("Dulex Rooms are 1 to 5");
+                                        System.out.println("Simple Rooms are 1 to 5");
                                     }
                                 }
                                 roomnoset.clear();
@@ -192,7 +216,7 @@ public class Hotel {
                                         }
                                     }
                                     else{
-                                        System.out.println("Dulex Rooms are 6 to 10");
+                                        System.out.println("A/C Rooms are 6 to 10");
                                     }
                                 }
                                 roomnoset.clear();
@@ -270,7 +294,7 @@ public class Hotel {
                                         }
                                     }
                                     else{
-                                        System.out.println("Dulex Rooms are 16 to 20");
+                                        System.out.println("Super Dulex Rooms are 16 to 20");
                                     }
                                 }
                                 roomnoset.clear();
@@ -336,13 +360,30 @@ public class Hotel {
             }
             else if(choice==4){
                 for (int i : ht.Avrooms) {
-                    System.out.print(i+",");
+                    if (i>0&&i<6) {
+                        System.out.println("S "+i);
+                    }
+                    else if(i>5&&i<11){
+                        System.out.println("A/c "+i);
+                    }
+                    else if(i>10&&i<16){
+                        System.out.println("D "+i);
+                    }
+                    else if(i>15&&i<21){
+                        System.out.println("SD "+i);
+                    }
                 }
             }
             else if (choice==5) {
                 ht.ViewAllCustomer();
             }
-           
+            else if (choice==6) {
+                ht.Wallet();
+            }
+            else if (choice==0)break;
+            else{
+                System.out.println("Invalid choice");
+            }
         }
     }
 }
