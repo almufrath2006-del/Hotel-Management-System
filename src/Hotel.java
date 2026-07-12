@@ -171,7 +171,6 @@ public class Hotel {
                                                 m++;
                                             } 
                                         }
-                                        
                                         if (m==ht.Avrooms.size()*rooms){
                                             rmtyp="Simple 2000/";rmamt=2000;w=1;break;
                                         }
