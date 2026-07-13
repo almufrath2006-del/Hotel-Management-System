@@ -29,7 +29,8 @@ public class Hotel {
                         int i=Integer.parseInt(s);
                         Avrooms.remove(i);
                     }
-                }int r=st.executeUpdate("delete from customer where name='"+name2+"';");
+                }
+                int r=st.executeUpdate("delete from customer where name='"+name2+"';");
                 if (r!=0) {
                     System.err.println("Customer removed");
                 }
@@ -67,15 +68,14 @@ public class Hotel {
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/rooms","root","1234");
             Statement st=con.createStatement();
             if(rno!=0){
-            ResultSet rs=st.executeQuery("select * from customer where room_no like '%"+rno+"%';");
-            rs.next();
-            System.out.println("\nName:"+rs.getString(1)+"\nPh no:"+rs.getInt(2)+"\nE-mail:"+rs.getString(3)+"\nRoom type:"+rs.getString(4)+"\nFrom:"+rs.getString(5)+"\nTo:"+rs.getString(6)+"\nDays:"+rs.getInt(7)+"\nRooms No:"+rs.getString(8)+"\nRooms:"+rs.getInt(9)+"\nAmount:"+rs.getInt(10)); 
-            }
-            else if(rno==0){
-                ResultSet rs=st.executeQuery("select * from customer where name='"+name+"';");
+                ResultSet rs=st.executeQuery("select * from customer where room_no like '%"+rno+"%';");
                 rs.next();
                 System.out.println("\nName:"+rs.getString(1)+"\nPh no:"+rs.getInt(2)+"\nE-mail:"+rs.getString(3)+"\nRoom type:"+rs.getString(4)+"\nFrom:"+rs.getString(5)+"\nTo:"+rs.getString(6)+"\nDays:"+rs.getInt(7)+"\nRooms No:"+rs.getString(8)+"\nRooms:"+rs.getInt(9)+"\nAmount:"+rs.getInt(10)); 
-            
+            }
+            else if(rno==0){
+                ResultSet rs=st.executeQuery("select * from customer where name like'%"+name+"%';");
+                rs.next();
+                System.out.println("\nName:"+rs.getString(1)+"\nPh no:"+rs.getInt(2)+"\nE-mail:"+rs.getString(3)+"\nRoom type:"+rs.getString(4)+"\nFrom:"+rs.getString(5)+"\nTo:"+rs.getString(6)+"\nDays:"+rs.getInt(7)+"\nRooms No:"+rs.getString(8)+"\nRooms:"+rs.getInt(9)+"\nAmount:"+rs.getInt(10)); 
             }
         }
         catch(Exception e){
@@ -98,18 +98,38 @@ public class Hotel {
             e.printStackTrace();
         }
     }
+    void AvailableRooms(){
+        int s=0;int AC=0;int d=0;int ud=0;
+        System.out.println();
+        for (int i : Avrooms) {
+            if (i>0&&i<6) {
+                s++;
+            }
+            else if(i>5&&i<11){
+                AC++;
+            }
+            else if(i>10&&i<16){
+                d++;
+            }
+            else if(i>15&&i<21){
+                ud++;
+            }
+            System.out.print(i+",");
+        }
+        System.out.println("\nS-"+(5-s)+",A/C-"+(5-AC)+",D-"+(5-d)+",UD-"+(5-ud));
+        System.out.println(20-Avrooms.size()+" rooms are available");
+    }
     void Wallet(){
       try{
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/rooms","root","1234");
             Statement st=con.createStatement();
             ResultSet rs=st.executeQuery("select wallet from wallet;");
             rs.next();
-                System.out.println("Amount:"+rs.getString(1));
+            System.out.println("Amount:"+rs.getString(1));
         }
         catch(Exception e){
             e.printStackTrace();
         }
-
     }
     public static void main(String[] args){
         Hotel ht=new Hotel();
@@ -122,14 +142,14 @@ public class Hotel {
             while (rs1.next()) {
                 String i[]=rs1.getString(1).split(",");
                 for (String string : i) {
-                int j=Integer.parseInt(string);
-                ht.Avrooms.add(j);
+                    int j=Integer.parseInt(string);
+                    ht.Avrooms.add(j);
                 }
             }
         }
         catch(Exception e){}
         while (true) {
-            System.out.println("\n1.Add Customer\n2.Remove Customer\n3.Search\n4.Occupied Rooms\n5.View All Customer\n6.Wallet\n0 for stop");
+            System.out.println("\n1.Add Customer\n2.Remove Customer\n3.Search\n4.Available Rooms\n5.View All Customer\n6.Wallet\n0 for stop");
             int choice=sc.nextInt();
             if(choice==1) {
                 sc.nextLine();
@@ -146,6 +166,7 @@ public class Hotel {
                     if(email.equals("0"))break;
                     String rmtyp=null;int rmamt=0;String roomsno=null;int rooms=0;
                     System.out.println("\nSelect Room Type\n1.Simple 2000 1-5/\n2.A/c 3000 6-10/\n3.Dulex 4000 11-15/\n4.Ultra Dulex 5000 16-20/");
+                    ht.AvailableRooms();
                     int choice2=sc.nextInt();      
                     if (choice2==1) {
                       sc.nextLine();
@@ -358,20 +379,7 @@ public class Hotel {
                 ht.search(rno,name);
             }
             else if(choice==4){
-                for (int i : ht.Avrooms) {
-                    if (i>0&&i<6) {
-                        System.out.println("S "+i);
-                    }
-                    else if(i>5&&i<11){
-                        System.out.println("A/c "+i);
-                    }
-                    else if(i>10&&i<16){
-                        System.out.println("D "+i);
-                    }
-                    else if(i>15&&i<21){
-                        System.out.println("SD "+i);
-                    }
-                }
+                ht.AvailableRooms();
             }
             else if (choice==5) {
                 ht.ViewAllCustomer();
